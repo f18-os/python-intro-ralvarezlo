@@ -28,8 +28,9 @@ with open(inName, 'r') as inputFile:
     for line in inputFile:
         # get rid of newline characters
         line = line.strip()
-        #change hyphens to spaces
+        #change hyphens and apostrophes to spaces
         line = line.replace("-", " ")
+        line = line.replace("\'", " ")
         #remove punctuation
         for i in string.punctuation:
             line = line.replace(i, "")
