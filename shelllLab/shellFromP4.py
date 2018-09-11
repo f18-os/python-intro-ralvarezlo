@@ -8,15 +8,14 @@ import time
 import subprocess
 
 def setIns(auxIn):
-    uIn = []
+    uIn = list()
     out = "p4-output.txt"
     if len(auxIn) == 1:
-        uIn[0] = auxIn[0]
+        uIn = auxIn
     elif len(auxIn) == 2:
-        uIn[0] = auxIn[0]
-        uIn[2] = auxIn[1]
+        uIn = auxIn
     elif len(auxIn) == 3:
-        if auxIn[2] == "<":
+        if auxIn[1] == "<":
             uIn[0] = auxIn[0]
             uIn[1] = auxIn[2]
     elif len(auxIn) == 4:
