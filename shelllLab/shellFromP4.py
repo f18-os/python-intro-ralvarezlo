@@ -64,7 +64,7 @@ elif rc == 0:                   # child
         print("Args is " + i)
     print("out is " +  uOut)
     
-    if (out != "p4-output.txt"):
+    if (uOut != "p4-output.txt"):
         os.close(1)                 # redirect child's stdout
         sys.stdout = open(uOut, "w")
         fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
