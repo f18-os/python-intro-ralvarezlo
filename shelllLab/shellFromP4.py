@@ -2,6 +2,28 @@
 
 import os, sys, time, re
 
+def setIns():
+    uIn = sys.argv
+    out = "p4-output.txt"
+    if len(sys.argv) == 1 or len(sys.argv) == 2:
+        print("one or two commands")
+    elif len(sys.argv) == 3:
+        if sys.argv[1] == ">":
+            uIn[0] = sys.argv[0]
+            uIn[1] = sys.argv[2]
+    elif len(sys.argv) == 4:
+        if args[2] == ">":
+            uIn[0] = sys.argv[0]
+            uIn[1] = sys.argv[1]
+            out = sys.argv[3]
+        elif args[2] == "<":
+            uIn[0] = sys.argv[0]
+            uIn[1] = sys.argv[3]
+            out = sys.argv[1]
+        else: sys.exit(1)
+    else: sys.exit(1)
+    return uIn, out
+
 pid = os.getpid()               # get and remember pid
 
 os.write(1, ("About to fork (pid=%d)\n" % pid).encode())
@@ -41,24 +63,3 @@ else:                           # parent (forked ok)
     os.write(1, ("Parent: Child %d terminated with exit code %d\n" % 
                  childPidCode).encode())
 
-def setIns():
-    uIn = sys.argv
-    out = "p4-output.txt"
-    if len(sys.argv) == 1 or len(sys.argv) == 2:
-        print("one or two commands")
-    elif len(sys.argv) == 3:
-        if asys.argv[1] == ">":
-            uIn[0] = sys.argv[0]
-            uIn[1] = sys.argv[2]
-    elif sys.argv(args) == 4:
-        if args[2] == ">":
-            uIn[0] = sys.argv[0]
-            uIn[1] = sys.argv[1]
-            out = sys.argvs[3]
-        elif args[2] == "<":
-            uIn[0] = sys.argv[0]
-            uIn[1] = sys.argv[3]
-            out = sys.argv[1]
-        else: sys.exit(1)
-    else: sys.exit(1)
-    return uIn, out
