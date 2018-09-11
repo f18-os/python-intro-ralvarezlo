@@ -10,8 +10,11 @@ import subprocess
 def setIns():
     uIn = []
     out = "p4-output.txt"
-    if len(sys.argv) == 1 or len(sys.argv) == 2:
-        print("one or two commands")
+    if len(sys.argv) == 1:
+        uIn[0] = sys.argv[0]
+    elif len(sys.argv) == 2:
+        uIn[0] = sys.argv[0]
+        uIn[1] = sys.argv[1]
     elif len(sys.argv) == 3:
         if sys.argv[1] == ">":
             uIn[0] = sys.argv[0]
