@@ -8,7 +8,7 @@ import time
 import subprocess
 
 def setIns():
-    uIn = sys.argv
+    uIn = []
     out = "p4-output.txt"
     if len(sys.argv) == 1 or len(sys.argv) == 2:
         print("one or two commands")
@@ -27,7 +27,6 @@ def setIns():
             out = sys.argv[1]
         else: sys.exit(1)
     else: sys.exit(1)
-    print("uOut: " + out)
     return uIn, out
 
 pid = os.getpid()               # get and remember pid
@@ -46,8 +45,13 @@ elif rc == 0:                   # child
     # args = ["wc", "p3-exec.py"]
     args, uOut = setIns()
 
+    for i in args:
+        print("Args is " + args[i])
+    print("out is " +  uOut)
+    
+
     os.close(1)                 # redirect child's stdout
-    sys.stdout = open("p4-output.txt", "w")
+    sys.stdout = open(uOut, "w")
     fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
     os.set_inheritable(fd, True)
     os.write(2, ("Child: opened fd=%d for writing\n" % fd).encode())
