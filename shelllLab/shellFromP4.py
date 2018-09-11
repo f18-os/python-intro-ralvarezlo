@@ -18,6 +18,9 @@ def setIns(auxIn):
         if auxIn[1] == "<":
             uIn[0] = auxIn[0]
             uIn[1] = auxIn[2]
+        else:
+            print("Incorrect input")
+            sys.exit(1)
     elif len(auxIn) == 4:
         if auxIn[2] == ">":
             uIn[0] = auxIn[0]
@@ -27,7 +30,9 @@ def setIns(auxIn):
             uIn[0] = auxIn[0]
             uIn[1] = auxIn[3]
             out = auxIn[1]
-        else: sys.exit(1)
+        else:
+            print("Incorrect input")
+            sys.exit(1)
     else: 
         print("no args")
         sys.exit(1)
@@ -59,12 +64,12 @@ elif rc == 0:                   # child
         print("Args is " + i)
     print("out is " +  uOut)
     
-
-    os.close(1)                 # redirect child's stdout
-    sys.stdout = open(uOut, "w")
-    fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
-    os.set_inheritable(fd, True)
-    os.write(2, ("Child: opened fd=%d for writing\n" % fd).encode())
+    if (out != "p4-output.txt"):
+        os.close(1)                 # redirect child's stdout
+        sys.stdout = open(uOut, "w")
+        fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
+        os.set_inheritable(fd, True)
+        os.write(2, ("Child: opened fd=%d for writing\n" % fd).encode())
 
     for dir in re.split(":", os.environ['PATH']): # try each directory in path
         program = "%s/%s" % (dir, args[0])
