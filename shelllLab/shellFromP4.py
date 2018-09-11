@@ -1,6 +1,11 @@
 #! /usr/bin/env python3
 
-import os, sys, time, re
+import sys
+import os
+import re
+import string
+import time
+import subprocess
 
 def setIns():
     uIn = sys.argv
@@ -22,6 +27,7 @@ def setIns():
             out = sys.argv[1]
         else: sys.exit(1)
     else: sys.exit(1)
+    print("uOut: " + uOut)
     return uIn, out
 
 pid = os.getpid()               # get and remember pid
