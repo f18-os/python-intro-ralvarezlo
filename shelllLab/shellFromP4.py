@@ -15,10 +15,11 @@ if rc < 0:
 elif rc == 0:                   # child
     os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" % 
                  (os.getpid(), pid)).encode())
-    args = ["wc", "p3-exec.py"]
+    # args = ["wc", "p3-exec.py"]
+    args, uOut = setIns(sys.argv)
 
     os.close(1)                 # redirect child's stdout
-    sys.stdout = open("p4-output.txt", "w")
+    sys.stdout = open(uOut, "w")
     fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
     os.set_inheritable(fd, True)
     os.write(2, ("Child: opened fd=%d for writing\n" % fd).encode())
@@ -39,3 +40,25 @@ else:                           # parent (forked ok)
     childPidCode = os.wait()
     os.write(1, ("Parent: Child %d terminated with exit code %d\n" % 
                  childPidCode).encode())
+
+def setIns(args):
+    uIn = []
+    out = "p4-output.txt"
+    if len(args) == 1 or len(args) == 2:
+        uIn = args
+    elif len(args) == 3:
+        if args[1] == ">":
+            uIn[0] = args[0]
+            uIn[1] = args[2]
+    elif len(args) == 4:
+        if args[2] == ">":
+            uIn[0] = args[0]
+            uIn[1] = args[1]
+            out = args[3]
+        elif args[2] == "<":
+            uIn[0] = args[0]
+            uIn[1] = args[3]
+            out = args[1]
+        else: sys.exit(1)
+    else: sys.exit(1)
+    return uIn, out
