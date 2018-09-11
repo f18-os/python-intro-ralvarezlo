@@ -16,7 +16,7 @@ elif rc == 0:                   # child
     os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" % 
                  (os.getpid(), pid)).encode())
     # args = ["wc", "p3-exec.py"]
-    args, uOut = setIns(sys.argv)
+    args, uOut = setIns()
 
     os.close(1)                 # redirect child's stdout
     sys.stdout = open(uOut, "w")
@@ -41,24 +41,24 @@ else:                           # parent (forked ok)
     os.write(1, ("Parent: Child %d terminated with exit code %d\n" % 
                  childPidCode).encode())
 
-def setIns(args):
-    uIn = []
+def setIns():
+    uIn = sys.argv
     out = "p4-output.txt"
-    if len(args) == 1 or len(args) == 2:
-        uIn = args
-    elif len(args) == 3:
-        if args[1] == ">":
-            uIn[0] = args[0]
-            uIn[1] = args[2]
-    elif len(args) == 4:
+    if len(sys.argv) == 1 or len(sys.argv) == 2:
+        print("one or two commands")
+    elif len(sys.argv) == 3:
+        if asys.argv[1] == ">":
+            uIn[0] = sys.argv[0]
+            uIn[1] = sys.argv[2]
+    elif sys.argv(args) == 4:
         if args[2] == ">":
-            uIn[0] = args[0]
-            uIn[1] = args[1]
-            out = args[3]
+            uIn[0] = sys.argv[0]
+            uIn[1] = sys.argv[1]
+            out = sys.argvs[3]
         elif args[2] == "<":
-            uIn[0] = args[0]
-            uIn[1] = args[3]
-            out = args[1]
+            uIn[0] = sys.argv[0]
+            uIn[1] = sys.argv[3]
+            out = sys.argv[1]
         else: sys.exit(1)
     else: sys.exit(1)
     return uIn, out
