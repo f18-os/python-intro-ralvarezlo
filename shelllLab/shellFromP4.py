@@ -8,7 +8,7 @@ import time
 import subprocess
 
 def setIns(auxIn):
-    uIn = list()
+    uIn = [" ", " "]
     out = "p4-output.txt"
     if len(auxIn) == 1:
         uIn = auxIn
@@ -36,7 +36,6 @@ def setIns(auxIn):
     else: 
         print("no args")
         sys.exit(1)
-    print("args are" + uIn[0])
     return uIn, out
 
 
@@ -59,10 +58,6 @@ elif rc == 0:                   # child
                  (os.getpid(), pid)).encode())
     # args = ["wc", "p3-exec.py"]
     args, uOut = setIns(myIn)
-
-    for i in args:
-        print("Args is " + i)
-    print("out is " +  uOut)
     
     if (uOut != "p4-output.txt"):
         os.close(1)                 # redirect child's stdout
