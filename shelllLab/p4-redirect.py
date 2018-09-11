@@ -15,7 +15,7 @@ if rc < 0:
 elif rc == 0:                   # child
     os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" % 
                  (os.getpid(), pid)).encode())
-    args = ["wc", "p3-exec.py"]
+    args = ["wc", "speech.txt"]
 
     os.close(1)                 # redirect child's stdout
     sys.stdout = open("p4-output.txt", "w")
