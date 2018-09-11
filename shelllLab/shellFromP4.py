@@ -11,23 +11,26 @@ def setIns():
     uIn = []
     out = "p4-output.txt"
     if len(sys.argv) == 1:
-        uIn[0] = sys.argv[0]
+        print("no args, exiting")
+        sys.exit(1)
     elif len(sys.argv) == 2:
-        uIn[0] = sys.argv[0]
-        uIn[1] = sys.argv[1]
+        uIn[0] = sys.argv[1]
     elif len(sys.argv) == 3:
-        if sys.argv[1] == ">":
-            uIn[0] = sys.argv[0]
-            uIn[1] = sys.argv[2]
+        uIn[0] = sys.argv[1]
+        uIn[2] = sys.argv[2]
     elif len(sys.argv) == 4:
-        if args[2] == ">":
-            uIn[0] = sys.argv[0]
-            uIn[1] = sys.argv[1]
-            out = sys.argv[3]
-        elif args[2] == "<":
-            uIn[0] = sys.argv[0]
+        if sys.argv[2] == "<":
+            uIn[0] = sys.argv[1]
             uIn[1] = sys.argv[3]
-            out = sys.argv[1]
+    elif len(sys.argv) == 5:
+        if sys.argv[3] == ">":
+            uIn[0] = sys.argv[1]
+            uIn[1] = sys.argv[2]
+            out = sys.argv[4]
+        elif args[3] == "<":
+            uIn[0] = sys.argv[1]
+            uIn[1] = sys.argv[4]
+            out = sys.argv[2]
         else: sys.exit(1)
     else: 
         print("no args")
