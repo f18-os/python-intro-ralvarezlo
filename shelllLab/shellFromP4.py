@@ -29,7 +29,10 @@ def setIns():
             uIn[1] = sys.argv[3]
             out = sys.argv[1]
         else: sys.exit(1)
-    else: sys.exit(1)
+    else: 
+        print("no args")
+        sys.exit(1)
+    print("args are" + uIn[0])
     return uIn, out
 
 pid = os.getpid()               # get and remember pid
