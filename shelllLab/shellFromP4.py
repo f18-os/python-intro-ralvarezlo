@@ -27,7 +27,7 @@ def setIns():
             out = sys.argv[1]
         else: sys.exit(1)
     else: sys.exit(1)
-    print("uOut: " + uOut)
+    print("uOut: " + out)
     return uIn, out
 
 pid = os.getpid()               # get and remember pid
