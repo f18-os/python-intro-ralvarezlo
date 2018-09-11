@@ -23,7 +23,7 @@ def setIns(auxIn):
             uIn[0] = auxIn[0]
             uIn[1] = auxIn[1]
             out = auxIn[3]
-        elif args[2] == "<":
+        elif auxIn[2] == "<":
             uIn[0] = auxIn[0]
             uIn[1] = auxIn[3]
             out = auxIn[1]
@@ -35,7 +35,9 @@ def setIns(auxIn):
     return uIn, out
 
 
-myIn = input("Please enter input").split(" ")
+auxStr = input("Please enter input: ")
+print("string input is " + auxStr)
+myIn = auxStr.split(" ")
 
 pid = os.getpid()               # get and remember pid
 
