@@ -56,7 +56,7 @@ elif rc == 0:                   # child
     args, uOut = setIns(myIn)
 
     for i in args:
-        print("Args is " + args[i])
+        print("Args is " + i)
     print("out is " +  uOut)
     
 
