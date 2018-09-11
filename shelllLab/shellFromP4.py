@@ -7,36 +7,36 @@ import string
 import time
 import subprocess
 
-def setIns():
+def setIns(auxIn):
     uIn = []
     out = "p4-output.txt"
-    if len(sys.argv) == 1:
-        print("no args, exiting")
-        sys.exit(1)
-    elif len(sys.argv) == 2:
-        uIn[0] = sys.argv[1]
-    elif len(sys.argv) == 3:
-        uIn[0] = sys.argv[1]
-        uIn[2] = sys.argv[2]
-    elif len(sys.argv) == 4:
-        if sys.argv[2] == "<":
-            uIn[0] = sys.argv[1]
-            uIn[1] = sys.argv[3]
-    elif len(sys.argv) == 5:
-        if sys.argv[3] == ">":
-            uIn[0] = sys.argv[1]
-            uIn[1] = sys.argv[2]
-            out = sys.argv[4]
-        elif args[3] == "<":
-            uIn[0] = sys.argv[1]
-            uIn[1] = sys.argv[4]
-            out = sys.argv[2]
+    if len(auxIn) == 1:
+        uIn[0] = auxIn[0]
+    elif len(auxIn) == 2:
+        uIn[0] = auxIn[0]
+        uIn[2] = auxIn[1]
+    elif len(auxIn) == 3:
+        if auxIn[2] == "<":
+            uIn[0] = auxIn[0]
+            uIn[1] = auxIn[2]
+    elif len(auxIn) == 4:
+        if auxIn[2] == ">":
+            uIn[0] = auxIn[0]
+            uIn[1] = auxIn[1]
+            out = auxIn[3]
+        elif args[2] == "<":
+            uIn[0] = auxIn[0]
+            uIn[1] = auxIn[3]
+            out = auxIn[1]
         else: sys.exit(1)
     else: 
         print("no args")
         sys.exit(1)
     print("args are" + uIn[0])
     return uIn, out
+
+
+myIn = input("Please enter input").split(" ")
 
 pid = os.getpid()               # get and remember pid
 
@@ -52,7 +52,7 @@ elif rc == 0:                   # child
     os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" % 
                  (os.getpid(), pid)).encode())
     # args = ["wc", "p3-exec.py"]
-    args, uOut = setIns()
+    args, uOut = setIns(myIn)
 
     for i in args:
         print("Args is " + args[i])
