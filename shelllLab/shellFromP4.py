@@ -8,34 +8,26 @@ import time
 import subprocess
 
 def setIns(auxIn):
-    uIn = [" ", " "]
+    uIn = [auxIn[0]]
     out = "p4-output.txt"
-    if len(auxIn) == 1:
-        uIn = auxIn
-    elif len(auxIn) == 2:
-        uIn = auxIn
-    elif len(auxIn) == 3:
-        if auxIn[1] == "<":
-            uIn[0] = auxIn[0]
-            uIn[1] = auxIn[2]
-        else:
-            print("Incorrect input")
-            sys.exit(1)
-    elif len(auxIn) == 4:
-        if auxIn[2] == ">":
-            uIn[0] = auxIn[0]
-            uIn[1] = auxIn[1]
-            out = auxIn[3]
-        elif auxIn[2] == "<":
-            uIn[0] = auxIn[0]
-            uIn[1] = auxIn[3]
-            out = auxIn[1]
-        else:
-            print("Incorrect input")
-            sys.exit(1)
-    else: 
-        print("no args")
-        sys.exit(1)
+
+    i = 1
+    while i < len(auxIn):
+        if auxIn[i] == ">":
+            if i+1 < len(auxIn):
+                out = auxIn[i+1]
+            if (i-1) != 0:
+                uIn[1] = auxIn[i-1]
+        elif auxIn[i] == "<":
+            if i+1 < len(auxIn):
+                uIn[1] = auxIn[i+1]
+            if (i-1) != 0:
+                out = auxIn[i-1]
+            else:
+                print("Invalid Argument")
+                sys.exit(1)
+        i += 1
+
     return uIn, out
 
 
@@ -60,6 +52,7 @@ elif rc == 0:                   # child
     args, uOut = setIns(myIn)
     
     if (uOut != "p4-output.txt"):
+        print("output is " + uOut)
         os.close(1)                 # redirect child's stdout
         sys.stdout = open(uOut, "w")
         fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
