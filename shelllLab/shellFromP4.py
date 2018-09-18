@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
-
 import sys
 import os
 import re
 import string
 import time
 import subprocess
+import fileinput
 
 def setIns(auxIn):
     uIn = [auxIn[0]]
@@ -17,10 +17,10 @@ def setIns(auxIn):
             if i+1 < len(auxIn):
                 out = auxIn[i+1]
             if (i-1) != 0:
-                uIn[1] = auxIn[i-1]
+                uIn.append(auxIn[i-1])
         elif auxIn[i] == "<":
             if i+1 < len(auxIn):
-                uIn[1] = auxIn[i+1]
+                uIn.append(auxIn[i+1])
             if (i-1) != 0:
                 out = auxIn[i-1]
             else:
@@ -56,22 +56,25 @@ elif rc == 0:                   # child
     # args = ["wc", "p3-exec.py"]
 
     if iPipe:
-        w, r = os.pipe()
+        r,w = os.pipe()
         # FIX THIS
 
         pid = os.getpid()               # get and remember pid
         os.write(1, ("About to fork for pipe (pid=%d)\n" % pid).encode())
+
+        for f in (r,w):
+            os.set_inheritable(f, True)
         fNum = os.fork()
 
         if fNum == 0: # child for pipe
             args, uOut = setIns(auxArr[0])
             os.close(1)
-            w = os.fdopen(w, 'w')
-            fd = w.fileno()
-            os.set_inheritable(fd, True)
-            os.write(2, ("ChildPIPE: opened fd=%d for writing\n" % fd).encode())
             
-
+            os.dup2(w, 1, True)
+            sys.stdout = open(w, 'w')
+            for fd in (r, w):
+                os.close(fd)
+            
             for dir in re.split(":", os.environ['PATH']): # try each directory in path
                 programIn = "%s/%s" % (dir, args[0])
                 try:
@@ -82,16 +85,24 @@ elif rc == 0:                   # child
             
         else:
             args, uOut = setIns(auxArr[1])
-            childPidCode = os.wait()
-            r = os.fdopen(r, 'r')
-            args[1] = r.read()
+            os.close(0)
+            os.dup2(r, 0, True)
+            for fd in (w, r):
+                os.close(fd)
+        
+            auxStr = ""
+            for line in fileinput.input():
+                auxStr += line + "\n"
+            args.append(auxStr)
+
             if (uOut != "p4-output.txt"):
                 print("output is " + uOut)
                 os.close(1)                 # redirect child's stdout
-                sys.stdout = open(uOut, "w")
+                sys.stdout = open(1, "w")
                 fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
                 os.set_inheritable(fd, True)
                 os.write(2, ("Child: opened fd=%d for writing\n" % fd).encode())
+            
             for dir in re.split(":", os.environ['PATH']): # try each directory in path
                 program = "%s/%s" % (dir, args[0])
                 try:
