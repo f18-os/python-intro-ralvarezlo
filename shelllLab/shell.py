@@ -33,6 +33,10 @@ def mustPipe(auxStr):
         while i < len(auxA):
             if (auxA[i][0] == " "):
                 auxA[i] = auxA[i][1:]
+            length = len(auxA)-1
+            if (auxA[i][length]==" "):
+                length -= 1
+                auxA[i] = auxA[i][:length]
             i +=1
     return isPipe, auxA
 
@@ -77,12 +81,12 @@ def setOutFile(uOut):
 
 done = False
 pr, pw = os.pipe()
-
 while not done:
     auxStr = input("$ ")
     if (auxStr == "exit"): sys.exit(1)
     doPipe, myIns = mustPipe(auxStr)
     pid = os.getpid()
+        
 
     fork1 = os.fork()
     if fork1 < 0:
