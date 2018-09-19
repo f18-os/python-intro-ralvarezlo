@@ -31,19 +31,22 @@ def setIns(auxIn):
 
 def mustPipe (auxStr):
     isPipe = False
-    auxArr = auxStr.split("|")
-    if len(auxArr) > 1:
+    auxA = auxStr.split("|")
+    if len(auxA) > 1:
         isPipe = True
-    return isPipe, auxArr
+        i = 1
+        while i < len(auxA):
+            if (auxA[i][0] == " "):
+                auxA[i] = auxA[i][1:]
+            i +=1
+    return isPipe, auxA
 
 auxStr = input("$ ")
 iPipe, auxArr = mustPipe(auxStr)
+
 myIn = auxStr.split(" ")
 
 pid = os.getpid()               # get and remember pid
-
-os.write(1, ("About to fork (pid=%d)\n" % pid).encode())
-
 rc = os.fork()
 
 if rc < 0:
@@ -53,28 +56,26 @@ if rc < 0:
 elif rc == 0:                   # child
     os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" % 
                  (os.getpid(), pid)).encode())
-    # args = ["wc", "p3-exec.py"]
 
     if iPipe:
         r,w = os.pipe()
-        # FIX THIS
-
-        pid = os.getpid()               # get and remember pid
-        os.write(1, ("About to fork for pipe (pid=%d)\n" % pid).encode())
 
         for f in (r,w):
             os.set_inheritable(f, True)
         fNum = os.fork()
 
         if fNum == 0: # child for pipe
-            args, uOut = setIns(auxArr[0])
+            aArr = [auxArr[0]]
+            args, uOut = setIns(aArr)
+
             os.close(1)
-            
-            os.dup2(w, 1, True)
-            sys.stdout = open(w, 'w')
+            os.dup(w)
+            fdc = sys.stdout.fileno()
+            os.set_inheritable(fdc, True)
+
             for fd in (r, w):
                 os.close(fd)
-            
+
             for dir in re.split(":", os.environ['PATH']): # try each directory in path
                 programIn = "%s/%s" % (dir, args[0])
                 try:
@@ -83,17 +84,17 @@ elif rc == 0:                   # child
                     pass
             sys.exit(1)
             
-        else:
-            args, uOut = setIns(auxArr[1])
+        else: #parent for pipe
+            aArr = [auxArr[1]]
+            margs, uOut = setIns(aArr)
+
             os.close(0)
-            os.dup2(r, 0, True)
-            for fd in (w, r):
+            os.dup(r)
+            fdp = sys.stdin.fileno()
+            os.set_inheritable(fdp, True)
+
+            for fd in (r, w):
                 os.close(fd)
-        
-            auxStr = ""
-            for line in fileinput.input():
-                auxStr += line + "\n"
-            args.append(auxStr)
 
             if (uOut != "p4-output.txt"):
                 print("output is " + uOut)
@@ -102,17 +103,18 @@ elif rc == 0:                   # child
                 fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
                 os.set_inheritable(fd, True)
                 os.write(2, ("Child: opened fd=%d for writing\n" % fd).encode())
+
             
             for dir in re.split(":", os.environ['PATH']): # try each directory in path
-                program = "%s/%s" % (dir, args[0])
+                program = "%s/%s" % (dir, margs[0])
                 try:
-                    os.execve(program, args, os.environ) # try to exec program
-                    sys.exit(1)
+                    os.execve(program, margs, os.environ) # try to exec program
                 except FileNotFoundError:             # ...expected
                     pass                              # ...fail quietly 
 
             os.write(2, ("Child:    Error: Could not exec %s\n" % args[0]).encode())
             sys.exit(1)                 # terminate with error
+            
 
     args, uOut = setIns(myIn)
     
