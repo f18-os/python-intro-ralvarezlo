@@ -53,32 +53,30 @@ toClose: 1 or 0 (The fileDescriptor that will be closed)
 w, r: File descriptors opened by the pipe command to write and read respectively
 """
 def setFds(toClose, w, r):
+    os.write(2, ("To Close: %d, W: %d, R: %d\n" %(toClose, w, r)).encode())
     os.close(toClose)
-    os.write(2,("\nTo Close: %d \n" % toClose).encode())
     # if we close #1 we know we will want to dup the writting fd
     if (toClose==1):
-        fd = w
-    else: fd = r
-    os.dup(fd)
-    os.write(2,("FD: %d \n" % fd).encode())
+        #fd = w
+        os.write(2, ("Closed: %d FD: %d" %(toClose, fd)).encode())
+        os.dup2(w, 1)
+    else: 
+        #fd = r
+        os.write(2, ("Closed: %d FD: %d" %(toClose, fd)).encode())
+        os.dup2(r, 0)
+    
+    
+    for pipefd in (r, w):
+        os.close(pipefd)
 
-    for a in (r, w):
-        os.close(a)
-    if (toClose == 1):
-        fdc = sys.stdout.fileno()
-    else:
-        fdc = sys.stdin.fileno()
     # sets the selected fd to inheritable
-    os.set_inheritable(fdc, True)
-    os.write(2, ("\nStd o.i = %d" % fdc).encode())
     
 """
 Executes a command given the arguments (Given by the professor)
 """
 def excIt(args):
-    os.write(2, ("\nArgs0 is: :"+ args[0]+ ":").encode())
-    lenght = len(args)
-    os.write(2, ("\nArgsLength is: %d" % lenght).encode())
+    print("Inside Exec: " + args[0])
+    os.write(2,("\nArgs: " + args[0]+"\n").encode())
     for dir in re.split(":", os.environ['PATH']): # try each directory in path
         programIn = "%s/%s" % (dir, args[0])
         try:
@@ -101,13 +99,16 @@ def setOutFile(uOut):
 
 
 done = False
-pr, pw = os.pipe()
 while not done:
     auxStr = input("$ ")
     if (auxStr == "exit"): sys.exit(1)
     doPipe, myIns = mustPipe(auxStr)
     pid = os.getpid()
-        
+    if(doPipe):
+        pr, pw = os.pipe()
+        for fd in (pr, pw):
+            os.set_inheritable(fd, True)
+        os.write(2, ("pids for pip pr={0} pw={1}\n".format(pr,pw)).encode())
 
     fork1 = os.fork()
     if fork1 < 0:
@@ -117,37 +118,31 @@ while not done:
     elif fork1 == 0:                   # child1
         os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" % 
                     (os.getpid(), pid)).encode())
-
         args, myOut = setIns(myIns[0])
         if doPipe:
             setFds(1, pw, pr)
         else:
             setOutFile(myOut)
-
         excIt(args)
     else:
-        os.write(1, ("Parent: My pid=%d.  Child's pid=%d\n" % 
-                 (pid, fork1)).encode())
-        childPidCode = os.wait()
-        os.write(1, ("Parent: Child %d terminated with exit code %d\n" % 
-                 childPidCode).encode())
+        
         if doPipe:
             fork2 = os.fork()
             if fork2 < 0:
                 os.write(2, ("fork failed, returning %d\n" % rc).encode())
                 sys.exit(1)
 
-            elif fork2 == 0:                   # child1
-                os.write(1, ("Child: My pid==%d.  Parent's pid=%d\n" % 
-                            (os.getpid(), pid)).encode())
+            elif fork2 == 0:                   # child2
                 args, myOut = setIns(myIns[1])
-                os.write(1, ("\nArgs: " +  args[0]).encode())
                 setFds(0, pw, pr)
-                setOutFile(myOut)
+                #setOutFile(myOut)
                 excIt(args) 
             else:
                 os.write(1, ("Parent: My pid=%d.  Child's pid=%d\n" % 
                         (pid, fork2)).encode())
                 childPidCode = os.wait()
-                os.write(1, ("Parent: Child %d terminated with exit code %d\n" % 
-                        childPidCode).encode())
+
+                for pipefd in (pw, pr):
+                    os.close(pipefd)
+
+        child2Pid = os.wait()
