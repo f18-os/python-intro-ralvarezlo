@@ -1,6 +1,10 @@
 #! /usr/bin/env python3
 import sys, os, re, string, time
-
+"""
+Takes an string (previously splitted if there is a pipe sign) and returns
+an array uIn such as [Command String, Input File (if exists)] or [Cpmmand String]
+and uOut which is an string of the file where the output might be redirected
+"""
 def setIns(auxStr):
     auxIn = auxStr.split(" ")
     uIn = [auxIn[0]]
@@ -23,7 +27,10 @@ def setIns(auxStr):
                 sys.exit(1)
         i += 1
     return uIn, out
-
+"""
+Takes an string and splits it when the pipe symbol occurs,
+it returns an array of string and a boolean to know if the input requires pipping
+"""
 def mustPipe(auxStr):
     isPipe = False
     auxA = auxStr.split("|")
@@ -40,24 +47,34 @@ def mustPipe(auxStr):
             i +=1
     return isPipe, auxA
 
+"""
+SET FILE DESCRIPTORS
+toClose: 1 or 0 (The fileDescriptor that will be closed)
+w, r: File descriptors opened by the pipe command to write and read respectively
+"""
 def setFds(toClose, w, r):
     os.close(toClose)
     os.write(2,("\nTo Close: %d \n" % toClose).encode())
+    # if we close #1 we know we will want to dup the writting fd
     if (toClose==1):
         fd = w
     else: fd = r
     os.dup(fd)
     os.write(2,("FD: %d \n" % fd).encode())
+
     for a in (r, w):
         os.close(a)
     if (toClose == 1):
         fdc = sys.stdout.fileno()
     else:
         fdc = sys.stdin.fileno()
+    # sets the selected fd to inheritable
     os.set_inheritable(fdc, True)
     os.write(2, ("\nStd o.i = %d" % fdc).encode())
     
-
+"""
+Executes a command given the arguments (Given by the professor)
+"""
 def excIt(args):
     os.write(2, ("\nArgs0 is: :"+ args[0]+ ":").encode())
     lenght = len(args)
@@ -69,6 +86,10 @@ def excIt(args):
         except FileNotFoundError:             # ...expected
             pass
 
+"""
+Give the case that we want to redirect the output to an especific file
+it takes the fileName and sets it as the 'new' stdout
+"""
 def setOutFile(uOut):
     if (uOut != "p4-output.txt"):
         print("output is " + uOut)
