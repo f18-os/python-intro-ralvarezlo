@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
 
-import os, sys, time, re
+import os
+import re
+import sys
+import time
 
 pid = os.getpid()               # get and remember pid
 
