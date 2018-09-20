@@ -1,0 +1,11 @@
+- Fork structure got recommended by Sebastian Nunez (forking both childs to the parent instead of one child inside another)
+- EOError awareness got recommended by Eduardo Lara
+- Discussed general layout with Ricardo Todd
+- Execute and piping are heavily influenced in the professors code
+- Pipe close at the final stage on the parent got recommended by David Pruitt (TA)
+- Directory change logic got discussed with Adrian Orquiz
+- Piping before redirection hierarchy got discussed with Miguel Angel Zam.... Can't recall his last name :(
+
+References from web:
+https://www.tutorialspoint.com/python/os_pipe.htm
+https://docs.python.org/2.0/lib/os-fd-ops.html

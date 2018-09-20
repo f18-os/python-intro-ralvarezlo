@@ -78,7 +78,7 @@ def excIt(args):
         auxPath = args[1].split("\\")
         myPath= ""
         if (len(auxPath)>1):
-            i =0;
+            i =0
             while (i < len(auxPath)-1):
                 myPath  = myPath + auxPath + "//"
             myPath = myPath[:len(auxPath)-2]
