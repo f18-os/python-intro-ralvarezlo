@@ -8,7 +8,7 @@ and uOut which is an string of the file where the output might be redirected
 def setIns(auxStr):
     auxIn = auxStr.split(" ")
     uIn = [auxIn[0]]
-    out = "p4-output.txt"
+    out = ""
     i = 1
     while i < len(auxIn):
         if auxIn[i] == ">":
@@ -24,6 +24,8 @@ def setIns(auxStr):
             else:
                 print("Invalid Argument")
                 sys.exit(1)
+        elif len(auxIn) ==2:
+            uIn.append(auxIn[1])
         i += 1
     return uIn, out
 """
@@ -71,6 +73,18 @@ def setFds(toClose, w, r):
 Executes a command given the arguments (Given by the professor)
 """
 def excIt(args):
+    #Handle Redirect
+    try:
+        auxPath = args[1].split("\\")
+        myPath= ""
+        if (len(auxPath)>1):
+            i =0;
+            while (i < len(auxPath)-1):
+                myPath  = myPath + auxPath + "//"
+            myPath = myPath[:len(auxPath)-2]
+            changeDirectory(myPath)
+    except: pass
+    #Actual Excecution
     for dir in re.split(":", os.environ['PATH']): # try each directory in path
         programIn = "%s/%s" % (dir, args[0])
         try:
@@ -83,9 +97,9 @@ Give the case that we want to redirect the output to an especific file
 it takes the fileName and sets it as the 'new' stdout
 """
 def setOutFile(uOut):
-    if (uOut != "p4-output.txt"):
+    if (uOut != ""):
         os.close(1)                 # redirect child's stdout
-        sys.stdout = open(1, "w")
+        sys.stdout = open(uOut, "w")
         fd = sys.stdout.fileno() # os.open("p4-output.txt", os.O_CREAT)
         os.set_inheritable(fd, True)
 
